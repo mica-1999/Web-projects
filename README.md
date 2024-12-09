@@ -30,9 +30,7 @@ BCII Form: A form for submitting equipment requests, with server-side validation
 4. Security
 Session Management: Manages session timeouts and other session-related security features.
 CSRF Token Implementation: Protects against CSRF attacks by using tokens.
-File Structure
-bash
-Copiar código
+
 /Project#2
 │
 ├── assets/              # Static assets such as CSS, images, etc.
@@ -43,6 +41,7 @@ Copiar código
 ├── others/              # Miscellaneous files
 ├── registro/            # Records or logs
 ├── security/            # Security-related files (CSRF, session management)
+
 Files Explained
 auth:
 
@@ -76,6 +75,6 @@ Throughout the development of this project, I have worked on improving my skills
 Error handling and the use of try/catch blocks in PHP.
 Using PDO for database interaction, including prepared statements and parameter binding for security.
 Implementing CSRF protection and managing user sessions.
+
 Conclusion
 This project has been a great learning experience, especially in applying best practices for secure and efficient PHP development. The goal is to create a robust and user-friendly system that streamlines the equipment request process while ensuring security and validation.
-

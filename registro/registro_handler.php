@@ -1,6 +1,5 @@
 <?php
-session_start();
-require '../php-db/config.php';  // Include the database connection file
+require '../data/config.php';  // Include the database connection file
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -52,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($stmt->execute()) {
                     // Registration successful, redirect to login page
-                    header("Location: ../login/login.php");
+                    header("Location: ../auth/login.php");
                     exit();
                 } else {
                     $error = "An error occurred. Please try again later.";

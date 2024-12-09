@@ -1,7 +1,7 @@
 <?php
-session_start();  // Start the session to store user data
-require '../php-db/config.php';  // Include the database connection file
-
+ // Start the session to store user data
+require '../data/config.php';  // Include the database connection file
+ 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
@@ -10,6 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate inputs
     if (empty($username) || empty($password)) {
         $error = "Please fill in all fields.";
+    } elseif (strlen($username) < 3 || strlen($username) > 50) {
+        $error = "Username must be between 3 and 50 characters.";
+    } elseif (strlen($password) < 8 || strlen($password) > 20) {
+        $error = "Password must be between 8 and 20 characters.";
     } else {
         try {
             // Sanitize user inputs
@@ -27,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // If user exists, fetch user data
                 // Verify the hashed password
                 if (password_verify($password, $result['password_hash'])) {
+					session_start();	
                     // If password is correct, start the session and set the user session variable
                     $_SESSION['user_id'] = $result['id'];
                     $_SESSION['username'] = $result['username'];
@@ -35,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     session_regenerate_id(true);
 
                     // Redirect to a protected page
-                    header("Location: ../form-bcii.php");
+                    header("Location: ../forms/form-bcii.php");
                     exit();
                 } else {
                     $error = "Invalid password.";
@@ -58,4 +63,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Close the database connection (optional, as PDO will handle it automatically when the object is destroyed)
 $conn = null;
 ?>
-

@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="../css/registro.css">
+    <link rel="stylesheet" href="../assets/css/registro.css">
 </head>
 <body>
     <div class="register-container">
@@ -38,7 +38,7 @@
             
             <button type="submit">Register</button>
         </form>
-        <p>Already have an account? <a href="../login/login.php">Login here</a></p>
+        <p>Already have an account? <a href="../auth/login.php">Login here</a></p>
     </div>
 </body>
 </html>

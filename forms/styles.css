@@ -1,0 +1,224 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #333F51;
+}
+
+.form-container {
+    display: flex;
+    width: 80%;
+    max-width: 1400px;
+    height: 80vh;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: auto;
+}
+
+.info-section,
+.form-section {
+    width: 50%;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.info-section {
+    background-color: #f0f4f8;
+}
+
+.info-section .logo {
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+.info-section .title {
+    font-size: 1.8rem;
+    color: #06C597;
+    margin-top: 5vh;
+    margin-left: 3vw;
+}
+
+.info-section .equipment {
+    font-size: 28px;
+    margin-left: 5vw;
+    font-weight: bold;
+    margin-top: 3vh;
+}
+
+.info-section .lign-well {
+    margin-left: 5vw;
+    color: #6F7A97;
+}
+
+.info-section .lign-well > * {
+    margin-top: 20px;
+}
+
+.info-section p {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.info-section b {
+    color: #333;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.steps {
+    display: flex;
+    gap: 60px;
+    margin: 0 auto 30px auto;
+    justify-content: center;
+}
+
+.step {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    color: white;
+}
+
+.step.active {
+    background-color: #0091ea;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.submit-btn {
+    background-color: #0091ea;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background-color: #007bb5;
+}
+
+/* Flex Layout for Horizontal Grouping */
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between form groups */
+    margin-bottom: 5px;
+}
+
+.form-row .form-group {
+    width: 48%; /* Adjust width to fit side by side */
+}
+
+.form-row .form-group input,
+.form-row .form-group select {
+    width: 100%; /* Inputs take full width of their group */
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .info-section,
+    .form-section {
+        width: 100%;
+        height: auto;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px; /* Stack the form fields on smaller screens */
+    }
+
+    .form-row .form-group {
+        width: 100%; /* Form fields stack vertically on smaller screens */
+    }
+}
+
+/* Scrollbar Styling */
+.form-section::-webkit-scrollbar {
+    width: 10px;
+}
+
+.form-section::-webkit-scrollbar-thumb {
+    background-color: #0091ea;
+    border-radius: 10px;
+}
+
+.form-section::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.form-section::-webkit-scrollbar-thumb:hover {
+    background-color: #007bb5;
+}
+
+/* Subtitle styling */
+.subtitle {
+    color: #98A4B8;
+    line-height: 3rem;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #98A4B8;
+    font-family: Montserrat, Georgia, 'Times New Roman', Times, serif;
+    font-weight: 400;
+    font-size: 1.32rem;
+}
+
+.subtitle i {
+    font-size: 20px;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+
+
+
+
+
+

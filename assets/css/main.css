@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #344052;
+}
+
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 1120px;
+    height: 650px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.sidebar, .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    flex: 1;
+}
+
+.sidebar {
+    background-color: #0771B8;
+    color: white;
+    position: relative;
+}
+
+.sidebar .gov-logo {
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    width: 100px; /* Keep width the same */
+    height: 100px; /* Keep height the same */
+}
+
+.sidebar h1 {
+    font-size: 3.2rem;
+    margin-bottom: 10px;
+    margin-left: 80px;
+    margin-top: 25px;
+}
+
+.sidebar p {
+    font-size: 1.2rem;
+    margin-left: 80px;
+    margin-top: -50px;
+}
+
+.content h2 {
+    color: #58616f;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    margin-left: 50px;
+    font-family: "Mona Sans", system-ui, sans-serif;
+}
+
+.login-button {
+    background-color: #0771B8;
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 150px;
+    margin-left: 50px;
+    margin-top: 5px;
+}
+
+.login-button:hover {
+    background-color: #007bb5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .sidebar, .content {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
+
+    .sidebar .gov-logo {
+        width: 80px; /* Adjust logo size on small screens */
+        height: 80px; /* Adjust logo size on small screens */
+        top: 10px; /* Adjust position on smaller screens */
+        left: 30px; /* Adjust position on smaller screens */
+    }
+
+    .sidebar h1 {
+		margin-left: 100px;
+        font-size: 2rem;
+    }
+
+    .sidebar p {
+        font-size: 1rem;
+    }
+
+    .content h2 {
+        font-size: 1.25rem;
+    }
+
+    .login-button {
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+}
+
+
+
+

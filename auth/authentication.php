@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     session_regenerate_id(true);
 
                     // Redirect to a protected page
-                    header("Location: ../forms/form-bcii.php");
+                    header("Location: ../forms/actual-form.php");
                     exit();
                 } else {
                     $error = "Invalid password.";

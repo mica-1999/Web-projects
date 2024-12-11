@@ -1,6 +1,6 @@
 <?php
 // Include the configuration file to establish the database connection
-session_start(); 
+session_start();
 include '../security/CSRF-token.php';
 include '../security/session_management.php';
 require '../data/config.php';
@@ -15,20 +15,28 @@ $direcao_options = fetchDirecao($conn);
 
 // You don't need to explicitly close the connection, PDO handles it automatically when the script ends
 // $conn->close();
-
-
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BCII Request Form</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles-form.css">
+	<link rel="stylesheet" href="../assets/css/modal.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
+<!-- Modal HTML -->
+<div id="timeoutModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>Session Timeout</h2>
+        <p>Your session has expired due to inactivity. You will be redirected to the login page.</p>
+    </div>
+</div>
+
+
     <div class="form-container">
         <div class="info-section">
     <h1 class="title">PEDIDOS BCII</h1>
@@ -127,19 +135,32 @@ $direcao_options = fetchDirecao($conn);
 
             <div id="items-container">
                 <div class="form-row" id="item-row">
-                    <div class="form-group">
+                    <div class="form-group item-code">
                         <label for="item-code">Código Bens</label>
-                        <input type="text" id="item-code" placeholder="Digite o código do bem">
+                        <input type="text" id="item-code" placeholder="#Num">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group equip-name">
                         <label for="item-name">Nome do Item</label>
                         <input type="text" id="item-name" placeholder="Digite o nome do item">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group quantity-group">
                         <label for="quantity">Quantidade</label>
-                        <input type="number" id="quantity" value="1" min="1">
+                        <input type="number" id="quantity" value="0" min="1">
                     </div>
+					
+					<!-- Clean field button to clear the row fields -->
+					<button type="button" class="clean-btn">
+						<i class="fa">&#xf021;</i>
+					</button>
+					
+					<!-- Trash icon button to delete the row -->
+					<button type="button" class="delete-btn">
+						<i class="fa fa-trash"></i> 
+					</button>
+					
+
                 </div>
+				
             </div>
 
             <button type="button" id="add-item-btn" class="submit-btn" style="margin-bottom: 20px">+ Adicionar Item</button>
@@ -150,10 +171,12 @@ $direcao_options = fetchDirecao($conn);
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Enviar Pedido</button>
+        <button type="submit" class="submit-btn" style="background-color: #06C597;">Enviar Pedido</button>
     </form>
 </div>
     </div>
+	<!-- jQuery library (optional, but recommended if you don't already include it) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 	var timeoutDuration = 5*60; // Session timeout in seconds
 
@@ -201,22 +224,40 @@ $direcao_options = fetchDirecao($conn);
 		}
 	}
 </script>
-<!-- jQuery library (optional, but recommended if you don't already include it) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
-        // When the "+ Adicionar Item" button is clicked
-        $("#add-item-btn").click(function(){
-            // Clone the item-row form row
-            var newItemRow = $("#item-row").clone();
-            
-            // Clear the inputs inside the cloned row
-            newItemRow.find("input").val("");
+$(document).ready(function() {
+    // When the "+ Adicionar Item" button is clicked
+    $("#add-item-btn").click(function() {
+        // Clone the item-row form row
+        var newItemRow = $("#item-row").clone();
 
-            // Append the cloned row to the form
-            newItemRow.appendTo("#items-container");
-        });
+        // Clear the inputs inside the cloned row except for the quantity input
+        newItemRow.find("input").not("#quantity").val("");
+		
+		// Explicitly set the value of the quantity input to 0
+        newItemRow.find("#quantity").val("0");
+
+        // Append the cloned row to the form
+        newItemRow.appendTo("#items-container");
     });
+
+    // Delegate event handler for the clean button to clear inputs
+    $(document).on('click', '.clean-btn', function() {
+        // Find the closest form row and clear its input fields
+        var formRow = $(this).closest('.form-row');
+        formRow.find('input').not('#quantity').val('');
+        formRow.find('#quantity').val('0'); // Reset quantity to 0
+    });
+
+    // Delegate event handler for the delete button to remove the row
+    $(document).on('click', '.delete-btn', function() {
+        // Only delete if there are more than one row (to prevent deleting the last row)
+        if ($("#items-container .form-row").length > 1) {
+            $(this).closest('.form-row').remove();
+        }
+    });
+});
+
 </script>
 </body>
 </html>

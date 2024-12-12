@@ -126,14 +126,14 @@ li {
 
 /* ----------------------- FORM GROUPS STYLES ---------------------------*/
 .form-group {
-    margin-top: 30px;
+    margin-top: 36px;
     position: relative; /* This makes the form-group act as the reference for absolute positioning */
 }
 .form-group label {
     position: absolute;
     top: 50%;
     left: 10px;
-	color: #555;
+	color: #3A3F48;
     transform: translateY(-50%);
     transition: all 0.2s ease-out;
     pointer-events: none;
@@ -151,7 +151,7 @@ li {
 }
 .form-group input:focus,
 .form-group textarea:focus {
-    border-color: #2962ff;
+    border-color: #2B98F7;
 }
 .form-group input:focus ~ label,
 .form-group select:focus ~ label,
@@ -161,7 +161,7 @@ li {
     top: -10px;
     left: 10px;
     font-size: 12px;
-    color: #2962ff; /* Change color when focused */
+    color: #2B98F7; /* Change color when focused */
 }
 .form-group textarea {
     resize: vertical;
@@ -180,7 +180,7 @@ li {
     top: -10px;
     left: 10px;
     font-size: 12px;
-    color: #2962ff;
+    color: #2B98F7;
 }
 
 /* Apply label movement when there is a selected option or input value for select/date */
@@ -190,15 +190,14 @@ li {
     top: -10px;
     left: 10px;
     font-size: 12px;
-    color: #2962ff;
+    color: #2B98F7;
 }
 
 
 /* ----------------------- FORM ROWS STYLES ---------------------------*/
 .form-row {
     display: flex;
-    gap: 15px; /* Space between form groups */
-    margin-bottom: 5px;
+    gap: 4px; /* Space between form groups */
     justify-content: space-between;
 }
 .form-row .form-group {
@@ -322,12 +321,20 @@ li {
 
 /* Styles for the "Add Item" text */
 .add-item-text {
-    margin-left: 5px;
-    font-size: 18px;
-    color: #333;
+	margin-top: 5px;
+    cursor: pointer;
+    color: #4981ff;
+    padding: 6px 5px;
+    float: left;
 }
 
 /* -----------------------------------------------------------------------------------------------------TESTING CSS------------------------------------------------------------------------------------------------- */
+.form-group.justificacao {
+    margin-top: 60px;
+}
 
+#item-row button {
+    gap: 0; /* Remove gap between buttons */
+}
 
 

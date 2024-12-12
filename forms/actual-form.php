@@ -80,7 +80,7 @@ $direcao_options = fetchDirecao($conn);
 		</div>
 
 		
-		<form action="#">
+		<form action="#" id="multi-step-form">
 			<input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 			<div class="form-content">
 				<div id="dados-gerais">
@@ -116,6 +116,8 @@ $direcao_options = fetchDirecao($conn);
 						</select>
 						<label for="direcao">Direção</label>
 					</div>
+					
+					
 					<div class="form-group">
 
 						<select name="secretaria[]" id="secretaria" required>
@@ -127,7 +129,7 @@ $direcao_options = fetchDirecao($conn);
 					
 					<div class="form-row">
 						<div class="form-group">
-							<input type="date" id="request-date" required />
+							<input type="text" id="request-date" required placeholder="Data do Pedido" />
 							<label for="request-date">Data do Pedido</label>
 						</div>
 					</div>
@@ -148,7 +150,7 @@ $direcao_options = fetchDirecao($conn);
 								<label for="item-name">Nome do Item</label>
 							</div>
 							<div class="form-group quantity-group">
-								<input type="number" id="quantity" value="0" min="1" required />
+								<input type="number" id="quantity" min="1" required />
 								<label for="quantity">Quantidade</label>
 							</div>
 
@@ -164,16 +166,28 @@ $direcao_options = fetchDirecao($conn);
 						</div>
 					</div>
 					
-					<button type="button" class="add-item-button" id="add-item-btn">
-						<i class="plus-icon">+</i>
-					</button>
-					<span class="add-item-text">Add Item</span>
-
+						<img src="../assets/images/icn-plus-circle.svg" data-cmp-info="10" id="add-new-item" style="margin-top:5px;float: left;width: 30px;cursor: pointer;">
+						<span class="add-item-text">Add Item</span>
+						
+					<div class="form-group justificacao">
+						<select name="direcao_destino[]" id="direcao" required>
+							<option value=""></option>
+							<?php echo $direcao_options; ?>
+						</select>
+						<label for="direcao">Direção</label>
+					</div>
+					
 					<div class="form-group">
-							<textarea id="justification" rows="4" placeholder="Digite a justificação" required></textarea>
-
+							<textarea id="justification" rows="4" required></textarea>
+							<label for="justification">Justificação</label>
+					</div>
+					<div class="form-row" id="button-row">
+						<button type="button" class="submit-btn anterior" id="anterior-dados-gerais" style="background-color: #6c757d;">Anterior</button>
+						<button type="button" class="submit-btn proximo" id="proximo-revisao" style="background-color: #00AA6D;">Próximo</button>
 					</div>
 				</div> 
+				
+				<div id="revisao" style="display: none">this is just testing</div>
 			</div>
 			
 			
@@ -182,6 +196,23 @@ $direcao_options = fetchDirecao($conn);
 	</div>
 </div>
 	<!-- jQuery library (optional, but recommended if you don't already include it) -->
+	
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var dateInput = document.getElementById('request-date');
+
+  dateInput.addEventListener('focus', function() {
+    dateInput.type = 'date';
+  });
+
+  dateInput.addEventListener('blur', function() {
+    if (dateInput.value === '') {
+      dateInput.type = 'text';
+      dateInput.placeholder = 'Data do Pedido';
+    }
+  });
+});
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 	var timeoutDuration = 5*60; // Session timeout in seconds
@@ -230,105 +261,6 @@ $direcao_options = fetchDirecao($conn);
 		}
 	}
 </script>
-<script>
-$(document).ready(function() {
-	
-	
-$("#proximo-equipamentos").click(function(e) {
-    e.preventDefault(); // Prevent form submission (if any)
-	
-	    // Validate required fields in "Dados Pessoais"
-    let isValid = true;
-
-    // Check if all required fields are filled
-    $("#dados-gerais input[required], #dados-gerais select[required]").each(function() {
-        if (!$(this).val()) {
-            isValid = false;
-            $(this).css('border-bottom', '2px solid red'); // Red bottom border for empty fields
-        } else {
-            $(this).css('border-bottom', '2px solid green'); // Green bottom border for filled fields
-        }
-    });
-
-    if (!isValid) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return; // Stop the function if validation fails
-    }
-
-    // Hide the "Dados Gerais" section
-    $("#dados-gerais").fadeOut(500);  // Fade out for smooth transition
-
-    // Show the "Equipamentos" section after a short delay (to match fadeOut duration)
-    setTimeout(function() {
-        $("#equipamentos").fadeIn(500);  // Fade in with a smooth transition
-    }, 500); // Match the duration of the fadeOut effect
-	
-	// Update the step indicators to show the second step as active
-    $(".step").removeClass("active"); // Remove 'active' class from all steps
-    $(".step:nth-child(2)").addClass("active");
-});
-	
-	
-    // When the "+ Adicionar Item" button is clicked
-    $("#add-item-btn").click(function() {
-        // Clone the item-row form row
-        var newItemRow = $("#item-row").clone();
-
-        // Clear the inputs inside the cloned row except for the quantity input
-        newItemRow.find("input").not("#quantity").val("");
-		
-		// Explicitly set the value of the quantity input to 0
-        newItemRow.find("#quantity").val("0");
-
-        // Append the cloned row to the form
-        newItemRow.appendTo("#items-container");
-    });
-
-    // Delegate event handler for the clean button to clear inputs
-    $(document).on('click', '.clean-btn', function() {
-        // Find the closest form row and clear its input fields
-        var formRow = $(this).closest('.form-row');
-        formRow.find('input').not('#quantity').val('');
-        formRow.find('#quantity').val('0'); // Reset quantity to 0
-    });
-
-    // Delegate event handler for the delete button to remove the row
-    $(document).on('click', '.delete-btn', function() {
-        // Only delete if there are more than one row (to prevent deleting the last row)
-        if ($("#items-container .form-row").length > 1) {
-            $(this).closest('.form-row').remove();
-        }
-    });
-	
-	
-});
-
-</script>
-
-<script>
-const openModalButtons = document.querySelectorAll('.open-modal'),
-      modal = document.querySelector('.modal'),
-      closeModalButtons = document.querySelectorAll('.close-modal');
-
-openModalButtons.forEach(openBtn => {
-  openBtn.addEventListener('click', openModal)
-});
-
-closeModalButtons.forEach(closeBtn => {
-  closeBtn.addEventListener('click', closeModal)
-});
-
-function openModal() {
-  modal.classList.add('visible');
-}
-
-function closeModal() {
-  modal.classList.remove('visible');
-}
-
-
-
-</script>
-
+<script src="../assets/js/form-wizard.js"></script>
 </body>
 </html>

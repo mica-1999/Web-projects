@@ -88,11 +88,11 @@ Throughout the development of this project, I have worked on improving my skills
 - Using PDO for database interaction, including prepared statements and parameter binding for security.
 - Implementing CSRF protection and managing user sessions.
 
-##TLDR: Lang Used and Code*
+## *TLDR: Lang Used and Code*
+
 JQuery -> Used EventListeners on the form, could be the focus,blur or just the document listening.
 CSS -> Advanced to emluate animations of the label.
 PHP -> PDO for prepared statements, server side verification, authetntication, session id, CSRF tokens are gonna be used to verify the form.
-
 
 
 

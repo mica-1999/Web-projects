@@ -49,6 +49,7 @@ body {
 .info-section .lign-well {
     margin-left: 5vw;
     color: #6F7A97;
+	margin-top: 70px;
 }
 .info-section .lign-well > * {
     margin-top: 20px;
@@ -71,9 +72,11 @@ li {
     width: 50%;
     padding: 40px;
     overflow-y: auto;
+
+
 }
 .form-section::-webkit-scrollbar {
-    width: 10px;
+    width: 6px;
 }
 .form-section::-webkit-scrollbar-thumb {
     background-color: #0091ea;
@@ -92,7 +95,7 @@ li {
     gap: 60px;
     margin: 0 auto 30px auto;
     justify-content: center;
-	margin-top: 50px;
+	margin-top: 33px;
 }
 .step {
     width: 50px;
@@ -110,13 +113,13 @@ li {
 
 /* -------------------------------------------------- TITLE SECTIONS IN FORM  ---------------------------------------------------*/
 .subtitle {
-    color: #98A4B8;
+    color: #056aa9;
     line-height: 3rem;
     margin-bottom: 12px;
-    border-bottom: 1px solid #98A4B8;
+    border-bottom: 1px solid #056aa9;
     font-family: Montserrat, Georgia, 'Times New Roman', Times, serif;
     font-weight: 400;
-    font-size: 1.32rem;
+    font-size: 1.42rem;
 }
 .subtitle i {
     font-size: 20px;
@@ -126,7 +129,7 @@ li {
 
 /* ----------------------- FORM GROUPS STYLES ---------------------------*/
 .form-group {
-    margin-top: 36px;
+    margin-top: 38px;
     position: relative; /* This makes the form-group act as the reference for absolute positioning */
 }
 .form-group label {
@@ -321,7 +324,7 @@ li {
 
 /* Styles for the "Add Item" text */
 .add-item-text {
-	margin-top: 5px;
+	margin-top: 20px;
     cursor: pointer;
     color: #4981ff;
     padding: 6px 5px;
@@ -330,11 +333,25 @@ li {
 
 /* -----------------------------------------------------------------------------------------------------TESTING CSS------------------------------------------------------------------------------------------------- */
 .form-group.justificacao {
-    margin-top: 60px;
+    margin-top: 80px;
 }
 
 #item-row button {
     gap: 0; /* Remove gap between buttons */
 }
 
+/* Error message style */
+span.error-message {
+	position: absolute;
+    color: #d9534f;  /* Red color for error messages */
+    font-size: 12px;  /* Slightly smaller text for error messages */
+    display: block;  /* Ensure it's a block element to sit on its own line */
+}
 
+.important-notes {
+    padding-top: 50px; /* Add spacing above the "Notas Importantes" section */
+}
+.important-notes h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}

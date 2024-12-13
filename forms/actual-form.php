@@ -34,9 +34,9 @@ $direcao_options = fetchDirecao($conn);
 	<div class="info-section">
 		<h1 class="title">PEDIDOS BCII</h1>
 
-		<h3 class="equipment">Informações</h3>
+		<h3 class="equipment" style="display:none">Informações</h3>
 		<div class="lign-well">
-			<p class="form-description">Use este formulário para solicitar novos equipamentos para o seu departamento. Siga os passos e forneça as informações necessárias para garantir um processamento eficaz.</p>
+			<p class="form-description" style="display:none">Use este formulário para solicitar novos equipamentos para o seu departamento. Siga os passos e forneça as informações necessárias para garantir um processamento eficaz.</p>
 			<h2>Passos para Completar a Solicitação:</h2>
 			<ol>
 				<li><strong>Informações Pessoais:</strong>
@@ -63,12 +63,16 @@ $direcao_options = fetchDirecao($conn);
 					</ul>
 				</li>
 			</ol>
-			<h3>Notas Importantes:</h3>
-			<ul>
-				<li>Forneça informações completas para evitar atrasos.</li>
-				<li>Receberá uma confirmação por email após a submissão.</li>
-				<li>Em caso de dúvidas, contacte a equipa de suporte.</li>
-			</ul>
+			<div class="important-notes">
+				<h3>Notas Importantes:</h3>
+				<ul>
+					<li>Forneça informações completas para evitar atrasos.</li>
+					<li>Receberá uma confirmação por email após a submissão.</li>
+					<li>Em caso de dúvidas, contacte a equipa de suporte.</li>
+					<li><strong>Suporte:</strong> support@example.com</li>
+					<li><strong>Telefone:</strong> +55 (11) 91234-5678</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 	
@@ -89,10 +93,12 @@ $direcao_options = fetchDirecao($conn);
 						<div class="form-group">
 							<input type="text" id="first-name" placeholder="Digite o primeiro nome" required />
 							<label for="first-name">Primeiro Nome</label>
+							<span class="error-message" id="first-name-error"></span>
 						</div>
 						<div class="form-group">
 							<input type="text" id="last-name" placeholder="Digite o último nome" required />
 							<label for="last-name">Último Nome</label>
+							<span class="error-message" id="last-name-error"></span>
 						</div>
 					</div>
 					
@@ -102,10 +108,12 @@ $direcao_options = fetchDirecao($conn);
 						<div class="form-group">
 							<input type="email" id="email" placeholder="Digite o e-mail" required />
 							<label for="email">E-mail</label>
+							<span class="error-message" id="email-error"></span>
 						</div>
 						<div class="form-group">
 							<input type="text" id="voip" placeholder="Digite o número VoIP" required />
 							<label for="voip">VoIP</label>
+							<span class="error-message" id="voip-error"></span>
 						</div>
 					</div>
 					
@@ -115,6 +123,7 @@ $direcao_options = fetchDirecao($conn);
 							<?php echo $direcao_options; ?>
 						</select>
 						<label for="direcao">Direção</label>
+						<span class="error-message" id="direcao-error"></span>
 					</div>
 					
 					
@@ -125,12 +134,14 @@ $direcao_options = fetchDirecao($conn);
 							<?php echo $secretarias_options; ?>
 						</select>
 						<label for="secretaria">Secretária</label>
+						<span class="error-message" id="secretaria-error"></span>
 					</div>
 					
 					<div class="form-row">
 						<div class="form-group">
 							<input type="text" id="request-date" required placeholder="Data do Pedido" />
 							<label for="request-date">Data do Pedido</label>
+							<span class="error-message" id="request-date-error"></span>
 						</div>
 					</div>
 					
@@ -142,16 +153,19 @@ $direcao_options = fetchDirecao($conn);
 					<div id="items-container">
 						<div class="form-row" id="item-row">
 							<div class="form-group item-code">
-								<input type="text" id="item-code" placeholder="#Num" required />
+								<input type="text" class="item-code" id="item-code" placeholder="#Num" required />
 								<label for="item-code">#</label>
+								<span class="error-message" id="item-code-error"></span>
 							</div>
 							<div class="form-group equip-name">
-								<input type="text" id="item-name" placeholder="Digite o nome do item" required />
+								<input type="text" class="item-name" id="item-name" placeholder="Digite o nome do item" required />
 								<label for="item-name">Nome do Item</label>
+								<span class="error-message" id="item-name-error"></span>
 							</div>
 							<div class="form-group quantity-group">
-								<input type="number" id="quantity" min="1" required />
+								<input type="text" class="quantity" id="quantity" placeholder="Digite a Quantidade" required />
 								<label for="quantity">Quantidade</label>
+								<span class="error-message" id="quantity-error"></span>
 							</div>
 
 							<!-- Clean field button to clear the row fields -->
@@ -166,20 +180,22 @@ $direcao_options = fetchDirecao($conn);
 						</div>
 					</div>
 					
-						<img src="../assets/images/icn-plus-circle.svg" data-cmp-info="10" id="add-new-item" style="margin-top:5px;float: left;width: 30px;cursor: pointer;">
+						<img src="../assets/images/icn-plus-circle.svg" data-cmp-info="10" id="add-new-item" style="margin-top:20px;float: left;width: 30px;cursor: pointer;">
 						<span class="add-item-text">Add Item</span>
 						
 					<div class="form-group justificacao">
-						<select name="direcao_destino[]" id="direcao" required>
+						<select name="destino[]" class="destino" id="destino" required>
 							<option value=""></option>
 							<?php echo $direcao_options; ?>
 						</select>
-						<label for="direcao">Direção</label>
+						<label for="destino">Local de Destino</label>
+						<span class="error-message" id="destino-error"></span>
 					</div>
 					
 					<div class="form-group">
-							<textarea id="justification" rows="4" required></textarea>
+							<textarea id="justification"  class="justification" rows="4" placeholder="Please insert why you need this equipment" required></textarea>
 							<label for="justification">Justificação</label>
+							<span class="error-message" id="justification-error"></span>
 					</div>
 					<div class="form-row" id="button-row">
 						<button type="button" class="submit-btn anterior" id="anterior-dados-gerais" style="background-color: #6c757d;">Anterior</button>

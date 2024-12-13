@@ -355,3 +355,10 @@ span.error-message {
     font-size: 1.1em;
     margin-bottom: 10px;
 }
+
+/* Remove arrows for item-code input */
+#item-code::-webkit-outer-spin-button,
+#item-code::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

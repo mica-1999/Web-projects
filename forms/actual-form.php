@@ -153,7 +153,7 @@ $direcao_options = fetchDirecao($conn);
 					<div id="items-container">
 						<div class="form-row" id="item-row">
 							<div class="form-group item-code">
-								<input type="text" class="item-code" id="item-code" placeholder="#Num" required />
+								<input type="number" class="item-code" id="item-code" placeholder="#Num" required />
 								<label for="item-code">#</label>
 								<span class="error-message" id="item-code-error"></span>
 							</div>

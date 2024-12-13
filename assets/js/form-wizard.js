@@ -315,6 +315,7 @@ $("#dados-gerais input[required], #dados-gerais select[required]").on('blur', fu
         newItemRow.find('input').each(function() {
             var errorMessage = $(this).siblings('.error-message');
             errorMessage.text('').hide(); // Hide error messages
+			$(this).css('border-bottom', '1px solid #ddd'); // Reset border style to default
         }); 
 		// Append the cloned row to the form
 		newItemRow.appendTo("#items-container");
@@ -366,16 +367,21 @@ $("#dados-gerais input[required], #dados-gerais select[required]").on('blur', fu
         // Validate required fields in "Dados Pessoais" section
         let isValid = true;
 
-        // Check if all required fields in "dados-gerais" are filled
-        $("#equipamentos input[required], #equipamentos select[required],#equipamentos textarea[required]").each(function() {
-            if (!$(this).val()) {
-                isValid = false;
-                $(this).css('border-bottom', '2px solid red'); // Red bottom border for empty fields
-            } else {
+        // Validate all required fields
+		$("#equipamentos input[required], #equipamentos select[required],#equipamentos textarea[required]").each(function() {
+			let fieldValid = verifyStepTwo($(this)); // Validate each field
 
-                $(this).css('border-bottom', '2px solid green'); // Green bottom border for filled fields
-            }
-        });
+			if (!fieldValid.isValid) {
+				$(this).css('border-bottom', '2px solid red'); // Add red border for invalid fields
+				isValid = false; // Mark as invalid
+			}
+
+			// Manually check if the field is empty
+			if ($(this).val().trim() === '') {
+				$(this).css('border-bottom', '2px solid red'); // Add red border for empty fields
+				isValid = false; // Mark as invalid
+			}
+		});
 
         if (!isValid) {
             alert("Por favor, preencha todos os campos obrigatórios.");

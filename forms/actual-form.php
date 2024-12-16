@@ -277,6 +277,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 </script>
-<script src="../assets/js/form-wizard.js"></script>
+<script src="../assets/js/form-wizard-native.js"></script>
 </body>
 </html>

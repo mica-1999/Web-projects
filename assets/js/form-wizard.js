@@ -1,264 +1,369 @@
-function validateField(field) {
-    var value = field.val().trim();  // Get the value and trim any leading/trailing spaces
-    var id = field.attr('id'); // Get the id of the input field
-    var isValid = true;  // Initialize the validity as true
-    var regex;  // Initialize regex for validation
-	var errorMessage = ''; // Initialize error message
+// ----------------------------------------------------------------------------------------------------FUNCTIONS SECTION--------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------PHASE 1 VALIDATION -------------------------------------------------------------
+function validatePhaseOne(field) {
+    var value = field.val().trim();
+    var id = field.attr('id');
+    var isValid = true;
+    var errorMessage = '';
 
-
-
-    // If the field is empty, reset the border color and return false
     if (value === '') {
-        field.css('border-bottom', '1px solid #ddd'); // Reset border to default
+        field.css('border-bottom', '1px solid #ddd');
         return false;
     }
 
-    // Validation based on input id
     switch (id) {
-        case 'first-name':  // For the name field
-        case 'last-name':  // For the last-name field
-            if (value.length < 2 || value.length > 20) {
-                errorMessage = "O nome deve ter entre 2 e 20 caracteres.";
-				field.css('border-bottom', '2px solid red');
-                isValid = false;
-            } else if (!/^[a-zA-ZÀ-ÿ-' ]+$/.test(value)) {
-                errorMessage = "Somente letras, espaços, hífens e apóstrofos.";
-				field.css('border-bottom', '2px solid red');
-                isValid = false;
-            } else if (value !== value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()) {
-                errorMessage = "O nome deve começar com uma letra maiúscula.";
-				field.css('border-bottom', '2px solid red');
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+        case 'first-name':
+        case 'last-name':
+            ({ isValid, errorMessage } = validateNameField(value));
             break;
-        case 'email':  // For the email field
-            regex = /^[a-zA-Z0-9](\.?[a-zA-Z0-9_-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/;
-
-            function isValidEmail(email) {
-                if (!regex.test(email)) return false;
-                if (email.length > 320) return false;
-
-                var parts = email.split('@');
-                var localPart = parts[0];
-                var domainPart = parts[1];
-
-                if (localPart.length > 64) return false;
-                if (/\.{2,}/.test(localPart)) return false;
-                if (localPart.startsWith('.') || localPart.endsWith('.')) return false;
-
-                var domainLabels = domainPart.split('.');
-                for (var i = 0; i < domainLabels.length; i++) {
-                    if (domainLabels[i].length > 63 || !/^[a-zA-Z0-9-]+$/.test(domainLabels[i])) return false;
-                }
-
-                return true;
-            }
-
-            if (!isValidEmail(value)) {
-                field.css('border-bottom', '2px solid red');
-				errorMessage = "Por favor, insira um e-mail válido.";
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+        case 'email':
+            ({ isValid, errorMessage } = validateEmailField(value));
             break;
-        case 'voip':  // For the voip field
-            var voipNumber = parseInt(value, 10);
-            if (!/^\d{6}$/.test(value) || voipNumber < 400000 || voipNumber > 499999) {
-                field.css('border-bottom', '2px solid red');
-				 errorMessage = "Número de 6 dígitos, entre 400000 e 499999.";
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+        case 'voip':
+            ({ isValid, errorMessage } = validateVoipField(value));
             break;
-        case 'direcao':  // For the 'direcao' select field
-        case 'secretaria':  // For the 'secretaria' select field
-            if (!value) {
-                field.css('border-bottom', '2px solid red');
-				errorMessage = "Este campo é obrigatório.";
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+        case 'direcao':
+        case 'secretaria':
+            ({ isValid, errorMessage } = validateSelectField(value));
             break;
-        case 'request-date':  // For the date field
-            var selectedDate = new Date(value);
-            var minDate = new Date('2024-01-01');
-            var maxDate = new Date('2024-12-31');
-
-            if (!value || selectedDate < minDate || selectedDate > maxDate) {
-				errorMessage = "Por favor, insira uma data válida dentro de 2024.";
-                field.css('border-bottom', '2px solid red');
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+        case 'request-date':
+            ({ isValid, errorMessage } = validateDateField(value));
             break;
         default:
-            if (value.length < 2) {
-                field.css('border-bottom', '2px solid red');
-                isValid = false;
-            } else {
-                field.css('border-bottom', '2px solid green');
-            }
+            ({ isValid, errorMessage } = validateDefaultField(value));
             break;
     }
-
-    return { isValid: isValid, errorMessage: errorMessage };
+    field.css('border-bottom', isValid ? '2px solid green' : '2px solid red');
+    return { isValid, errorMessage };
 }
-function applyFocusAndInputStyles(selector) {
-        $(document).on('focus', selector, function() {
-            $(this).css('border-bottom', '1px solid #007bff');  // Apply a blue border for focus
-            $(this).css('color', '#007bff');  // Change the text color to blue on focus
-        });
+// -----------------------------------------------------PHASE 2 VALIDATION -------------------------------------------------------------
+function validatePhaseTwo(field) {
+    var value = field.val().trim();
+    var isValid = true;
+    var errorMessage = '';
 
-        $(document).on('input', selector, function() {
-            $(this).css('color', '#007bff');  // Change the text color to blue while typing
-        });
-
-        // Resets the color when unfocused and checks for errors
-        $(document).on('blur', selector, function() {
-            $(this).css('color', '#3A3F48');  // Reset color to normal when blurred
-            var result = verifyStepTwo($(this));
-            $('#' + $(this).attr('id') + '-error').text(result.errorMessage).show(); // Display the error message
-        });
-    }
-
-
-function verifyStepTwo(field) {
-	var value = field.val().trim();  // Get the value and trim any leading/trailing spaces
-    var classes = field.attr('class').split(/\s+/); // Get the classes of the input field
-    var isValid = true;  // Initialize the validity as true
-    var regex;  // Initialize regex for validation
-	var errorMessage = ''; // Initialize error message
-
-
-
-    // If the field is empty, reset the border color and return false
     if (value === '') {
-        field.css('border-bottom', '1px solid #ddd'); // Reset border to default
+        field.css('border-bottom', '1px solid #ddd');
         return false;
     }
-	
-	if (field.hasClass('item-code')) {  // Item code field
-        var itemCodeValue = parseInt(value);
-        if (isNaN(itemCodeValue) || itemCodeValue < 1 || itemCodeValue > 5000) {
-            field.css('border-bottom', '2px solid red');
-            isValid = false;
-            errorMessage = "Código inválido";
-        } else {
-            field.css('border-bottom', '2px solid green');
-        }
-    } else if (field.hasClass('item-name')) {  // Item name field
-        if (value.length < 2) {  // Minimum 2 characters for item name
-            field.css('border-bottom', '2px solid red');
-            isValid = false;
-            errorMessage = "Nome do item muito curto!";
-        } else {
-            field.css('border-bottom', '2px solid green');
-        }
-    } else if (field.hasClass('quantity')) {  // Quantity field
-        var quantityValue = parseInt(value);
-        if (isNaN(quantityValue) || quantityValue < 1 || quantityValue > 50) {
-            field.css('border-bottom', '2px solid red');
-            isValid = false;
-            errorMessage = "Qtd inválida";
-        } else {
-            field.css('border-bottom', '2px solid green');
-        }
-    } else if (field.hasClass('destino')) {  // Destination field (select dropdown)
-        if (value === '') {
-            field.css('border-bottom', '2px solid red');
-            isValid = false;
-            errorMessage = "Escolha um destino.";
-        } else {
-            field.css('border-bottom', '2px solid green');
-        }
-    } else if (field.hasClass('justification')) {  // Justification field (textarea)
-        if (value.length < 10) {  // Minimum 10 characters for justification
-            field.css('border-bottom', '2px solid red');
-            isValid = false;
-            errorMessage = "A justificação deve ter pelo menos 10 caracteres.";
-        } else {
-            field.css('border-bottom', '2px solid green');
-        }
+
+    if (field.hasClass('item-code')) {
+        ({ isValid, errorMessage } = validateItemCode(value));
+    } else if (field.hasClass('item-name')) {
+        ({ isValid, errorMessage } = validateItemName(value));
+    } else if (field.hasClass('quantity')) {
+        ({ isValid, errorMessage } = validateQuantity(value));
+    } else if (field.hasClass('destino')) {
+        ({ isValid, errorMessage } = validateDestino(value));
+    } else if (field.hasClass('justification')) {
+        ({ isValid, errorMessage } = validateJustification(value));
     } else {
-        field.css('border-bottom', '2px solid #ddd'); // Reset default style
+        field.css('border-bottom', '2px solid #ddd');
     }
-			
-	return { isValid: isValid, errorMessage: errorMessage };
+    field.css('border-bottom', isValid ? '2px solid green' : '2px solid red');
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------NAME VALIDATION  -------------------------------------------------------------
+
+function validateNameField(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (value.length < 2 || value.length > 20) {
+        errorMessage = "O nome deve ter entre 2 e 20 caracteres.";
+        isValid = false;
+    } else if (!/^[a-zA-ZÀ-ÿ-' ]+$/.test(value)) {
+        errorMessage = "Somente letras, espaços, hífens e apóstrofos.";
+        isValid = false;
+    } else if (value !== value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()) {
+        errorMessage = "O nome deve começar com uma letra maiúscula.";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------EMAIL VALIDATION  -------------------------------------------------------------
+function validateEmailField(value) {
+    const regex = /^[a-zA-Z0-9](\.?[a-zA-Z0-9_-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/;
+    let errorMessage = '';
+    let isValid = true;
+
+    if (!regex.test(value) || value.length > 320 || value.split('@')[0].length > 64 || /\.{2,}/.test(value.split('@')[0]) || value.startsWith('.') || value.endsWith('.')) {
+        errorMessage = "Por favor, insira um e-mail válido.";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------VOIP VALIDATION  -------------------------------------------------------------
+function validateVoipField(value) {
+    const voipNumber = parseInt(value, 10);
+    let errorMessage = '';
+    let isValid = true;
+
+    if (!/^\d{6}$/.test(value) || voipNumber < 400000 || voipNumber > 499999) {
+        errorMessage = "Número de 6 dígitos, entre 400000 e 499999.";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------DIR/SECRETARIA VALIDATION  -------------------------------------------------------------
+function validateSelectField(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (!value) {
+        errorMessage = "Este campo é obrigatório.";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------DATE VALIDATION  -------------------------------------------------------------
+function validateDateField(value) {
+    const selectedDate = new Date(value);
+    const minDate = new Date('2024-01-01');
+    const maxDate = new Date('2024-12-31');
+    let errorMessage = '';
+    let isValid = true;
+
+    if (!value || selectedDate < minDate || selectedDate > maxDate) {
+        errorMessage = "Por favor, insira uma data válida dentro de 2024.";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------ITEM CODE VALIDATION  -------------------------------------------------------------
+function validateItemCode(value) {
+    const itemCodeValue = parseInt(value, 10);
+    let errorMessage = '';
+    let isValid = true;
+
+    if (isNaN(itemCodeValue) || itemCodeValue < 1 || itemCodeValue > 5000) {
+        errorMessage = "Código inválido";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------ITEM NAME VALIDATION  -------------------------------------------------------------
+function validateItemName(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (value.length < 2) {
+        errorMessage = "Nome do item muito curto!";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------ITEM QUANTITY VALIDATION  -------------------------------------------------------------
+function validateQuantity(value) {
+    const quantityValue = parseInt(value, 10);
+    let errorMessage = '';
+    let isValid = true;
+
+    if (isNaN(quantityValue) || quantityValue < 1 || quantityValue > 50) {
+        errorMessage = "Qtd inválida";
+        isValid = false;
+    }
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------DESTINO VALIDATION  -------------------------------------------------------------
+function validateDestino(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (value === '') {
+        errorMessage = "Escolha um destino.";
+        isValid = false;
+    }
+
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------JUSTIFICATION VALIDATION  -------------------------------------------------------------
+function validateJustification(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (value.length < 10) {
+        errorMessage = "A justificação deve ter pelo menos 10 caracteres.";
+        isValid = false;
+    }
+
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------DEFAULT VALIDATION  -------------------------------------------------------------
+function validateDefaultField(value) {
+    let errorMessage = '';
+    let isValid = true;
+
+    if (value.length < 2) {
+        isValid = false;
+    }
+
+    return { isValid, errorMessage };
+}
+// -----------------------------------------------------INPUT AND FOCUS HANDLING  -------------------------------------------------------------
+function applyFocusAndInputStyles(selector) {
+    $(document).on('focus', selector, function() {
+        $(this).css({ 'border-bottom': '1px solid #007bff', 'color': '#007bff' });
+    }).on('input', selector, function() {
+        $(this).css('color', '#007bff');
+    }).on('blur', selector, function() {
+        $(this).css('color', '#3A3F48');
+        var result = validatePhaseTwo($(this));
+        $('#' + $(this).attr('id') + '-error').text(result.errorMessage).show();
+    });
+}
+// -----------------------------------------------------QUANTITY INPUT HANDLING  -------------------------------------------------------------
+function handleQuantityInput() {
+    $(document).on('focus', '.quantity', function() {
+        $(this).attr('type', 'number');
+    }).on('blur', '.quantity', function() {
+        if ($(this).val() === '') {
+            $(this).attr({ 'type': 'text', 'placeholder': 'Quantidade' });
+        }
+    });
+}
+// -----------------------------------------------------DATE INPUT HANDLING  -------------------------------------------------------------
+function handleDateInput() {
+    $('#request-date').on('focus', function() {
+        $(this).attr('type', 'date');
+    }).on('blur', function() {
+        if ($(this).val() === '') {
+            $(this).attr({ 'type': 'text', 'placeholder': 'Data do Pedido' });
+        }
+    });
 }
 
-// Function to handle the quantity input placeholder and type switch
-    function handleQuantityInput() {
-        // Event delegation for quantity inputs, including clones
-    $(document).on('focus', '.quantity', function() {
-        $(this).attr('type', 'number');  // Change input type to 'number' when focused
+// -----------------------------------------------------~RESET INPUT STYLES AND ERRORS  -------------------------------------------------------------
+function resetInputStyles(input) {
+    input.css('border-bottom', '1px solid #ddd').siblings('.error-message').text('').hide();
+}
+
+
+
+
+// ----------------------------------------------------------------------------------------------------(MAIN) FORM NAVIGATION---------------------------------------------------------------------------------------------------
+$(document).ready(function() {
+    var itemCounter = 1;
+    applyFocusAndInputStyles("#dados-gerais input[required], #dados-gerais select[required]");
+    applyFocusAndInputStyles("#equipamentos input[required], #equipamentos select[required], #equipamentos textarea[required]");
+    handleDateInput();
+    handleQuantityInput();
+
+// -----------------------------------------------------~PHASE 1 OF FORM   -------------------------------------------------------------
+	$("#dados-gerais input[required], #dados-gerais select[required]").on('blur', function() {
+        $(this).css('color', '#3A3F48');
+        var result = validatePhaseOne($(this));
+        $('#' + $(this).attr('id') + '-error').text(result.errorMessage).show();
     });
 
-    $(document).on('blur', '.quantity', function() {
-        if ($(this).val() === '') {
-            $(this).attr('type', 'text');  // Change back to 'text' when blurred if empty
-            $(this).attr('placeholder', 'Quantidade');  // Reset placeholder
+	$("#proximo-equipamentos").click(function(e) {
+        e.preventDefault(); // Prevent form submission (if any)
+        
+        let isValid = true;
+
+        // Validate all required fields in "dados-gerais" section
+        $("#dados-gerais input[required], #dados-gerais select[required]").each(function() {
+            let field = $(this);
+            let fieldValid = validatePhaseOne(field); // Check if the field is valid
+
+            // Check if the field is invalid or empty and add red border if so
+            if (!fieldValid.isValid || field.val().trim() === '') {
+                field.css('border-bottom', '2px solid red'); // Add red border for invalid/empty fields
+                isValid = false; // Mark as invalid
+            }
+        });
+
+        if (!isValid) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return; // Stop the function if validation fails
         }
-    });
-    }
 
-// Function to handle the date input placeholder and type switch
-function handleDateInput() {
-	var dateInput = $('#request-date');
+        // Hide the "Dados Gerais" section and show the "Equipamentos" section with smooth transitions
+        $("#dados-gerais").fadeOut(500, function() {
+            $("#equipamentos").fadeIn(500);
+        });
+
+        // Update the step indicators to show the second step as active
+        $(".step").removeClass("active"); // Remove 'active' class from all steps
+        $(".step:nth-child(2)").addClass("active"); // Add 'active' class to the second step
+    });
 	
-	dateInput.on('focus', function() {
-		dateInput.attr('type', 'date');
+	
+// -----------------------------------------------------~PHASE 2 OF FORM   -------------------------------------------------------------
+	// Event to reset color and show error on blur
+	$("#equipamentos input[required], #equipamentos select[required],#equipamentos textarea[required]").on('blur', function() {
+			$(this).css('color', '#3A3F48');  // Reset color to normal when blurred
+			var result = validatePhaseTwo($(this));
+			$('#' + $(this).attr('id') + '-error').text(result.errorMessage).show(); // Display the error message
 	});
 
-	dateInput.on('blur', function() {
-		if (dateInput.val() === '') {
-			dateInput.attr('type', 'text');
-			dateInput.attr('placeholder', 'Data do Pedido');
+	// Add new item row
+	$("#add-new-item").click(function() {
+		const newItemRow = $("#item-row").clone();
+		
+		// Update the IDs of cloned inputs to ensure uniqueness
+		newItemRow.find('input').each(function() {
+			const originalId = $(this).attr('id');
+			const newId = `${originalId}-${itemCounter}`;
+			$(this).attr('id', newId).siblings('label').attr('for', newId);
+			$(this).siblings('.error-message').attr('id', `${newId}-error`);
+		});
+
+		newItemRow.find('input').val(""); // Clear inputs
+		itemCounter++;
+
+		// Reset styles and error messages
+		newItemRow.find('input').each(function() {
+			resetInputStyles($(this));
+		});
+
+		newItemRow.appendTo("#items-container");
+		newItemRow.find('#quantity').each(handleQuantityInput); // Apply specific handlers for new inputs
+		applyFocusAndInputStyles(newItemRow.find('input[required], select[required]')); // Apply focus styles
+	});
+
+	// Clean button: clear input values and reset styles
+	$(document).on('click', '.clean-btn', function() {
+		const formRow = $(this).closest('.form-row');
+		formRow.find('input').val('');
+		resetInputStyles(formRow.find('input'));
+	});
+
+	// Delete button: remove the row, but only if there are more than one
+	$(document).on('click', '.delete-btn', function() {
+		if ($("#items-container .form-row").length > 1) {
+			$(this).closest('.form-row').remove();
 		}
 	});
-}
-// ----------------------------------------------------------------------------------------------------MAIN SECTION-------- ------------------------------------------------------------------------------------------------------
-$(document).ready(function() {
-	var itemCounter = 1; // Counter to generate unique IDs for each item-row
-	applyFocusAndInputStyles("#dados-gerais input[required], #dados-gerais select[required]");
-    applyFocusAndInputStyles("#equipamentos input[required], #equipamentos select[required], #equipamentos textarea[required]");
 
-	
-// ----------------------------------------------------------------------------------------------------------STEP 1 STUFF----------------------------------------------------------------------------------------------------
+		// Previous button: transition between sections and update step indicator
+	$("#anterior-dados-gerais").click(function(e) {
+		e.preventDefault();
 
-// -----------------------------------------------------INPUT UNFOCUS HANDLING -------------------------------------------------------------
-$("#dados-gerais input[required], #dados-gerais select[required]").on('blur', function() {
-        $(this).css('color', '#3A3F48');  // Reset color to normal when blurred
-        var result = validateField($(this));
-		$('#' + $(this).attr('id') + '-error').text(result.errorMessage).show(); // Display the error message
-    });
+		// Hide "Equipamentos" and show "Dados Gerais" with a smooth transition
+		$("#equipamentos").fadeOut(500, function() {
+			$("#dados-gerais").fadeIn(500);
+		});
 
-    // Initialize date input handling
-    handleDateInput();
-	handleQuantityInput();
-   // -----------------------------------------------------BUTTON NEXT HANDLING -------------------------------------------------------------
-	$("#proximo-equipamentos").click(function(e) {
-		e.preventDefault(); // Prevent form submission (if any)
-		
+		// Update the step indicator by removing 'active' from all steps
+		// and adding it to the first step
+		$(".step").removeClass("active").first().addClass("active");
+	});
+
+
+	// Next button for "Revisao": validate fields, transition between sections, and update step indicator
+	$("#proximo-revisao").click(function(e) {
+		e.preventDefault(); // Prevent form submission
+
 		let isValid = true;
 
-		// Validate all required fields in "dados-gerais" section
-		$("#dados-gerais input[required], #dados-gerais select[required]").each(function() {
-			let fieldValid = validateField($(this)); // Check if the field is valid
-			
-			if (!fieldValid.isValid) { // If the field is invalid
-				$(this).css('border-bottom', '2px solid red'); // Add red border for invalid fields
-				isValid = false; // Mark as invalid
-			}
+		// Validate required fields in "Equipamentos" section
+		$("#equipamentos input[required], #equipamentos select[required], #equipamentos textarea[required]").each(function() {
+			let field = $(this);
 
-			// Manually check if the field is empty, and add red border if so
-			if ($(this).val().trim() === '') {
-				$(this).css('border-bottom', '2px solid red'); // Add red border for empty fields
+			// Check if the field is valid or empty and apply red border if invalid
+			if (!validatePhaseTwo(field).isValid || field.val().trim() === '') {
+				field.css('border-bottom', '2px solid red'); // Apply red border for invalid/empty fields
 				isValid = false; // Mark as invalid
 			}
 		});
@@ -268,138 +373,12 @@ $("#dados-gerais input[required], #dados-gerais select[required]").on('blur', fu
 			return; // Stop the function if validation fails
 		}
 
-		// Hide the "Dados Gerais" section
-		$("#dados-gerais").fadeOut(500);  // Fade out for smooth transition
-		// Show the "Equipamentos" section after a short delay (to match fadeOut duration)
-		setTimeout(function() {
-			$("#equipamentos").fadeIn(500);  // Fade in with a smooth transition
-		}, 500); // Match the duration of the fadeOut effect
-
-		// Update the step indicators to show the second step as active
-		$(".step").removeClass("active"); // Remove 'active' class from all steps
-		$(".step:nth-child(2)").addClass("active");
-	});
-
-	
-	// ----------------------------------------------------------------------------------------------------------STEP 2 STUFF----------------------------------------------------------------------------------------------------
-
-	// Resets the color when unfocused and checks for errors
-	$("#equipamentos input[required], #equipamentos select[required],#equipamentos textarea[required]").on('blur', function() {
-			$(this).css('color', '#3A3F48');  // Reset color to normal when blurred
-			var result = verifyStepTwo($(this));
-			$('#' + $(this).attr('id') + '-error').text(result.errorMessage).show(); // Display the error message
-		});
-		
-		
-    // When the "+ Adicionar Item" button is clicked
-	$("#add-new-item").click(function() {
-		// Clone the item-row form row
-		var newItemRow = $("#item-row").clone();
-
-
-	// Update the IDs of cloned inputs to ensure uniqueness
-        newItemRow.find('input').each(function() {
-            var originalId = $(this).attr('id');
-            var newId = originalId + '-' + itemCounter; // Create a new unique ID based on itemCounter
-            $(this).attr('id', newId);
-            $(this).siblings('label').attr('for', newId);
-            $(this).siblings('.error-message').attr('id', newId + '-error');
-        });
-		// Clear the inputs inside the cloned row
-		newItemRow.find("input").val("");
-		
-		// Increment the itemCounter to ensure the next cloned row has a unique ID
-        itemCounter++;
-		
-		// Reset error messages and input styles for the cloned fields
-        newItemRow.find('input').each(function() {
-            var errorMessage = $(this).siblings('.error-message');
-            errorMessage.text('').hide(); // Hide error messages
-			$(this).css('border-bottom', '1px solid #ddd'); // Reset border style to default
-        }); 
-		// Append the cloned row to the form
-		newItemRow.appendTo("#items-container");
-		
-		// Apply quantity and date input handlers to the new item row
-		newItemRow.find('#quantity').each(handleQuantityInput);
-		
-		// Reapply focus and input styles to the cloned elements
-        applyFocusAndInputStyles(newItemRow.find('input[required], select[required]'));
-	});
-
-    // Delegate event handler for the clean button to clear inputs
-	$(document).on('click', '.clean-btn', function() {
-		// Find the closest form row and clear its input fields
-		var formRow = $(this).closest('.form-row');
-		formRow.find('input').val('').css('border-bottom', '1px solid #ddd'); // Replace #ccc with your desired default border color;
-        // Reset error messages for the cleared fields
-        formRow.find('.error-message').text('').hide();
-	});
-
-    // Delegate event handler for the delete button to remove the row
-    $(document).on('click', '.delete-btn', function() {
-        // Only delete if there are more than one row (to prevent deleting the last row)
-        if ($("#items-container .form-row").length > 1) {
-            $(this).closest('.form-row').remove();
-        }
-    });
-	
-	// Click event for the "Previous" button (Anterior)
-	$("#anterior-dados-gerais").click(function(e) {
-		e.preventDefault(); // Prevent form submission (if any)
-
-		// Hide the "Equipamentos" section with a fade-out effect
-		$("#equipamentos").fadeOut(500); // Fade out for smooth transition
-
-		// Show the "Dados Gerais" section after a short delay (to match fadeOut duration)
-		setTimeout(function() {
-			$("#dados-gerais").fadeIn(500); // Fade in with a smooth transition
-		}, 500); // Delay of 500ms to match the duration of fadeOut
-
-		// Update the step indicators to show the first step as active
-		$(".step").removeClass("active"); // Remove 'active' class from all steps
-		$(".step:nth-child(1)").addClass("active"); // Add 'active' class to the first step
-	});
-	
-	$("#proximo-revisao").click(function(e) {
-        e.preventDefault(); // Prevent form submission (if any)
-		
-        // Validate required fields in "Dados Pessoais" section
-        let isValid = true;
-
-        // Validate all required fields
-		$("#equipamentos input[required], #equipamentos select[required],#equipamentos textarea[required]").each(function() {
-			let fieldValid = verifyStepTwo($(this)); // Validate each field
-
-			if (!fieldValid.isValid) {
-				$(this).css('border-bottom', '2px solid red'); // Add red border for invalid fields
-				isValid = false; // Mark as invalid
-			}
-
-			// Manually check if the field is empty
-			if ($(this).val().trim() === '') {
-				$(this).css('border-bottom', '2px solid red'); // Add red border for empty fields
-				isValid = false; // Mark as invalid
-			}
+		// Hide the "Equipamentos" section and show the "Revisao" section with smooth transitions
+		$("#equipamentos").fadeOut(500, function() {
+			$("#revisao").fadeIn(500);
 		});
 
-        if (!isValid) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
-            return; // Stop the function if validation fails
-        }
-
-        // Hide the "Dados Gerais" section
-        $("#equipamentos").fadeOut(500);  // Fade out for smooth transition
-
-        // Show the "Revisao" section after a short delay (to match fadeOut duration)
-        setTimeout(function() {
-            $("#revisao").fadeIn(500);  // Fade in with a smooth transition
-        }, 500); // Match the duration of the fadeOut effect
-
-        // Update the step indicators to show the second step as active
-        $(".step").removeClass("active"); // Remove 'active' class from all steps
-        $(".step:nth-child(3)").addClass("active");
-    });
-	
-	
+		// Update the step indicators to show the third step as active
+		$(".step").removeClass("active").eq(2).addClass("active"); // Add 'active' to the third step
+	});	
 });

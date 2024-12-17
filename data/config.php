@@ -14,7 +14,6 @@ try {
     
     // Optionally, you can set default fetch mode to FETCH_ASSOC
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     // Handle connection errors
     die("Connection failed: " . $e->getMessage());

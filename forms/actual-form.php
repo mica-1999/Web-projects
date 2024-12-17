@@ -164,7 +164,7 @@ $direcao_options = fetchDirecao($conn);
 							</div>
 							<div class="form-group quantity-group">
 								<input type="text" class="quantity" id="quantity" placeholder="Digite a Quantidade" required />
-								<label for="quantity">Quantidade</label>
+								<label for="quantity">Qty</label>
 								<span class="error-message" id="quantity-error"></span>
 							</div>
 
@@ -250,31 +250,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Check session timeout every 5 seconds
 	setInterval(checkSessionTimeout, 5000);
 
-	// Function to show the modal
-	function showModal() {
-		var modal = document.getElementById("timeoutModal");
-		modal.style.display = "block";
-		
-		// Automatically redirect after a few seconds
-		setTimeout(function() {
-			window.location.href = "../auth/login.php"; // Redirect to login page
-		}, 5000); // Wait 5 seconds before redirect
-	}
-
-	// Function to close the modal manually (if needed)
-	function closeModal() {
-		var modal = document.getElementById("timeoutModal");
-		modal.style.display = "none";
-	}
-
 	// Modify checkSessionTimeout to show the modal instead of redirecting immediately
 	function checkSessionTimeout() {
 		var currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
 		var inactiveTime = currentTime - lastActivityTime; // Calculate time since last activity
-
-		if (inactiveTime > timeoutDuration) {
-			showModal(); // Show the modal
-		}
 	}
 </script>
 <script src="../assets/js/form-wizard-native.js"></script>

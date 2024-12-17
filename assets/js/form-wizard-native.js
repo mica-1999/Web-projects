@@ -125,6 +125,31 @@ function validateSelectField(value) {
     }
     return { isValid, errorMessage };
 }
+// -----------------------------------------------------DIR/SECRETARIA VALIDATION  -------------------------------------------------------------
+// Function to validate both direcao and secretaria
+function validateDirecaoAndSecretaria() {
+    const direcaoSelect = document.getElementById('direcao');
+    const secretariaSelect = document.getElementById('secretaria');
+
+    // Validate direcao
+    let direcaoResult = validateSelectField(direcaoSelect.value);
+    let direcaoErrorElement = document.getElementById(direcaoSelect.id + '-error');
+    if (direcaoErrorElement) {
+        direcaoErrorElement.textContent = direcaoResult.errorMessage;
+        direcaoErrorElement.style.display = direcaoResult.isValid ? 'none' : 'block';
+    }
+    direcaoSelect.style.borderBottom = direcaoResult.isValid ? '2px solid green' : '2px solid red';
+
+    // Validate secretaria
+    let secretariaResult = validateSelectField(secretariaSelect.value);
+    let secretariaErrorElement = document.getElementById(secretariaSelect.id + '-error');
+    if (secretariaErrorElement) {
+        secretariaErrorElement.textContent = secretariaResult.errorMessage;
+        secretariaErrorElement.style.display = secretariaResult.isValid ? 'none' : 'block';
+    }
+    secretariaSelect.style.borderBottom = secretariaResult.isValid ? '2px solid green' : '2px solid red';
+	secretariaSelect.style.color = "black";
+}
 // -----------------------------------------------------DATE VALIDATION  -------------------------------------------------------------
 function validateDateField(value) {
     const selectedDate = new Date(value);
@@ -247,6 +272,29 @@ function handleDateInput() {
         }
     });
 }
+
+// -----------------------------------------------------VALIDATE ITEM-CODE AND ITEM-NAME  -------------------------------------------------------------
+// Function to validate item-code and item-name
+function validateItemCodeAndName(itemCodeInput) {
+    const itemCode = itemCodeInput.value.trim();
+    const formRow = itemCodeInput.closest('.form-row');
+    const itemNameInput = formRow ? formRow.querySelector('.item-name') : null;
+
+    if (itemNameInput) {
+		itemNameInput.style.borderColor = "#ddd"; // Reset border color to default
+		itemNameInput.style.color = "#3A3F48"; // Reset border color to default
+        if (itemCode.length > 0 && !isNaN(itemCode)) {
+            if (itemNameInput.value.length > 0) {
+                itemNameInput.style.borderBottom = "2px solid green"; // Change border color to blue
+
+            } else {
+                itemNameInput.style.borderBottom = "2px solid red"; // Indicate an error if item-name is empty
+            }
+        } else {
+            itemNameInput.style.borderBottom = ""; // Reset border color
+        }
+    }
+}
 // -----------------------------------------------------~RESET INPUT STYLES AND ERRORS  -------------------------------------------------------------
 function resetInputStyles(input) {
     input.style.borderBottom = '1px solid #ddd'; // Reset input border style
@@ -264,6 +312,7 @@ function applyFocusAndInputStyles(elements) {
         // Apply border color and text color when the element is focused
         element.addEventListener('focus', function() {
             element.style.borderBottom = '1px solid #007bff';
+			
             element.style.color = '#007bff';
         });
 
@@ -282,9 +331,6 @@ function applyFocusAndInputStyles(elements) {
 }
 
 
-
-
-
 // ----------------------------------------------------------------------------------------------------(MAIN) FORM NAVIGATION---------------------------------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
 	var itemCounter = 2; // Counter for item rows
@@ -292,6 +338,10 @@ document.addEventListener('DOMContentLoaded', function() {
     applyFocusAndInputStyles(document.querySelectorAll("#equipamentos input[required], #equipamentos select[required], #equipamentos textarea[required]"));
     handleDateInput(); // Initialize date input handling
     handleQuantityInput(); // Initialize quantity input handling
+	const direcaoSelect = document.getElementById('direcao'); // Get the 'direcao' select element
+	const secretariaSelect = document.getElementById('secretaria'); // Get the 'secretaria' select element
+	
+	
 	
 // -----------------------------------------------------~PHASE 1 OF FORM   -------------------------------------------------------------
 	document.querySelectorAll("#dados-gerais input[required], #dados-gerais select[required]").forEach(function(element) {
@@ -300,9 +350,61 @@ document.addEventListener('DOMContentLoaded', function() {
 			var result = validatePhaseOne(element); // Validate Phase 1
 			document.getElementById(element.id + '-error').textContent = result.errorMessage; // Display error
 			document.getElementById(element.id + '-error').style.display = 'block'; // Show error message
+			
+			// If the blurred element is direcao, validate secretaria as well
+			if (element.id === 'direcao') {
+				validateDirecaoAndSecretaria();
+			}
 		});
 	});
 	
+	// Add focus event listener to direcaoSelect to highlight both fields
+	direcaoSelect.addEventListener('focus', function() {
+		direcaoSelect.style.borderBottom = '1px solid #007bff'; // Blue border for direcao
+		direcaoSelect.style.color = '#007bff'; // Blue text for direcao
+
+		secretariaSelect.style.borderBottom = '1px solid #007bff'; // Blue border for secretaria
+		secretariaSelect.style.color = '#007bff'; // Blue text for secretaria
+	});
+
+	// Add change event listener to direcaoSelect to update and validate secretaria
+	direcaoSelect.addEventListener('change', function() {
+		const selectedOption = direcaoSelect.options[direcaoSelect.selectedIndex];  // Get the selected <option>
+		const direcao = selectedOption.text;  // Get the text inside the selected <option>
+		
+		if (direcao) {
+			// Perform an AJAX request to fetch the Secretaria based on the selected 'direcao'
+			fetch('../data/sel-secretaria.php', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: `direcao=${encodeURIComponent(direcao)}`
+			})
+			.then(response => response.text()) // Get the response from PHP
+			.then(data => {
+				const secretariaSelect = document.getElementById('secretaria'); // Get the 'secretaria' select element
+				const options = secretariaSelect.options;
+				let found = false;
+
+				for (let i = 0; i < options.length; i++) {
+					if (options[i].text === data) {  // If the option text matches the fetched Secretaria
+						options[i].selected = true;  // Mark the option as selected
+						found = true;
+						break;
+					}
+				}
+
+				// If no matching Secretaria is found, clear the select or set default
+				if (!found) {
+					secretariaSelect.value = '';  // Clear the select if no matching option
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error); // Handle any errors that occurred during the fetch
+			});
+		}
+	});
 	document.getElementById("proximo-equipamentos").addEventListener("click", function(e) {
 		e.preventDefault(); // Prevent default behavior
 
@@ -357,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		field.addEventListener('blur', function() {
 			this.style.color = '#3A3F48';  // Reset color on blur
 			const result = validatePhaseTwo(this); // Validate Phase 2
+			
 			const errorElement = document.getElementById(this.id + '-error');
 			if (errorElement) {
 				errorElement.textContent = result.errorMessage; // Display error
@@ -365,6 +468,98 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 	
+	
+	
+	let timeout;
+	// Event listener for item-code inputs in dynamically added rows
+	document.querySelector("#items-container").addEventListener('input', function(event) {
+		// Check if the target is an item-code input
+		if (event.target && event.target.classList.contains('item-code')) {
+			let itemCode = event.target.value.trim();
+
+			// Validate input (only digits in this case)
+			if (itemCode.length > 0 && !isNaN(itemCode)) {
+				// Clear the previous timeout to debounce
+				clearTimeout(timeout);
+
+				// Debounce the AJAX call
+				timeout = setTimeout(function() {
+					// Send POST request with the item code
+					fetch('../data/get-item-info.php', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: `code=${encodeURIComponent(itemCode)}`  // Send item code as URL-encoded body
+					})
+					.then(response => response.json()) // Get the JSON response from PHP
+					.then(data => {
+						if (data.success) {
+							// Find the corresponding item-name input for the current row
+							let itemNameInput = event.target.closest('.form-row').querySelector('.item-name');
+							let qtyInput = event.target.closest('.form-row').querySelector('.quantity');
+							let qtyErrorMessage = event.target.closest('.form-row').querySelector('.quantity-group .error-message');  // Find the quantity error message span
+
+							if (itemNameInput) {
+								itemNameInput.value = data.item_name;
+								itemNameInput.style.color = "#007bff"; // Set color to blue
+								itemNameInput.style.borderColor = "#007bff"; // Set border color to blue
+							}
+
+							if (qtyErrorMessage) {
+								// Update the error message with available stock
+								let stock = data.stock;  // Retrieve the stock from the data
+								qtyErrorMessage.textContent = `Available: ${stock}`;  // Display stock in the error message
+								qtyErrorMessage.style.color = 'green'; // Style the message (green for availability)
+								qtyErrorMessage.style.display = 'block'; // Ensure it's visible
+							}
+						} else {
+							let itemNameInput = event.target.closest('.form-row').querySelector('.item-name');
+							let qtyErrorMessage = event.target.closest('.form-row').querySelector('.quantity-group .error-message');
+
+							if (itemNameInput) {
+								itemNameInput.value = '';
+								itemNameInput.style.borderColor = "#ccc";
+							}
+
+							if (qtyErrorMessage) {
+								qtyErrorMessage.textContent = '';  // Clear the stock message if item not found
+								qtyErrorMessage.style.display = 'none';  // Hide the error message
+							}
+						}	
+					})
+					.catch(error => {
+						console.error('Error:', error); // Handle any errors during fetch
+					});
+				}, 300);  // Wait 300ms after user stops typing
+			} else {
+				let itemNameInput = event.target.closest('.form-row').querySelector('.item-name');
+				let qtyErrorMessage = event.target.closest('.form-row').querySelector('.quantity-group .error-message');
+
+				if (itemNameInput) {
+					itemNameInput.value = '';
+					itemNameInput.style.borderColor = "#ccc";
+				}
+
+				if (qtyErrorMessage) {
+					qtyErrorMessage.textContent = ''; // Clear the stock message if item code is invalid
+					qtyErrorMessage.style.display = 'none';  // Hide the error message
+				}
+			}
+		}
+	});
+
+
+	// Event to reset color and show error on blur for item-name validation
+	document.getElementById('items-container').addEventListener('blur', function(event) {
+		if (event.target && event.target.classList.contains('item-code')) {
+			validateItemCodeAndName(event.target);
+		}
+	}, true);
+	
+	
+	
+	// Event listener for adding a new item
 	document.getElementById("add-new-item").addEventListener("click", function() {
 		const itemRow = document.getElementById("item-row");
 		const newItemRow = itemRow.cloneNode(true); // Clone the item row
@@ -372,7 +567,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		inputs.forEach(function(input) {
 			const originalId = input.id;
-			const newId = `${originalId}-${itemCounter}`;
+			const baseId = originalId.replace(/-\d+$/, ''); // Remove any existing number suffix
+			const newId = `${baseId}-${itemCounter}`;
 			input.id = newId;
 
 			const label = newItemRow.querySelector(`label[for='${originalId}']`);
@@ -418,6 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
+	// Event listener for deleting an item
 	document.querySelector("#items-container").addEventListener('click', function(event) {
 		if (event.target && event.target.closest('.delete-btn')) {
 			const formRow = event.target.closest('.form-row');
@@ -427,55 +624,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			if (formRows.length > 1) {
 				formRow.remove(); // Remove the row
-
-				// After removing, re-index the remaining rows and update their IDs
-				const remainingRows = document.querySelectorAll("#items-container .form-row");
-				
-				remainingRows.forEach((row, index) => {
-					const inputs = row.querySelectorAll('input');
-					inputs.forEach(function(input) {
-						const baseId = input.id.split('-')[0]; // Get the base ID before any number
-						const newId = `${baseId}-${index + 1}`; // Update the ID with the new index
-
-						// Update the input's ID
-						input.id = newId;
-
-						// Update the label's 'for' attribute
-						const label = row.querySelector(`label[for='${baseId}']`);
-						if (label) {
-							label.setAttribute('for', newId);
-						}
-
-						// Update the error message's ID
-						const errorMessage = row.querySelector(`#${baseId}-error`);
-						if (errorMessage) {
-							errorMessage.id = `${newId}-error`;
-						}
-					});
-
-					// Update labels and error messages separately
-					const labels = row.querySelectorAll('label');
-					labels.forEach(function(label) {
-						const forAttr = label.getAttribute('for');
-						if (forAttr) {
-							const baseFor = forAttr.split('-')[0]; // Get the base for attribute
-							const newFor = `${baseFor}-${index + 1}`; // Update the for attribute with the new index
-							label.setAttribute('for', newFor);
-						}
-					});
-
-					const errorMessages = row.querySelectorAll('.error-message');
-					errorMessages.forEach(function(errorMessage) {
-						const baseErrorId = errorMessage.id.split('-')[0]; // Get the base ID before any number
-						const newErrorId = `${baseErrorId}-${index + 1}-error`; // Update the ID with the new index
-						errorMessage.id = newErrorId;
-					});
-				});
 			}
 		}
 	});
 
-	
+
 	// Previous button: transition between sections and update step indicator
 	document.getElementById("anterior-dados-gerais").addEventListener('click', function(e) {
 		e.preventDefault(); // Prevent default action (e.g., form submission)

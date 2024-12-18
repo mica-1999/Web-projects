@@ -129,7 +129,7 @@ li {
 
 /* ----------------------- FORM GROUPS STYLES ---------------------------*/
 .form-group {
-    margin-top: 38px;
+    margin-top: 32px;
     position: relative; /* This makes the form-group act as the reference for absolute positioning */
 }
 .form-group label {

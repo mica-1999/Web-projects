@@ -199,7 +199,6 @@ function validateQuantity(value) {
 
     // Find the stock value in the span next to the quantity input
     let hiddenStockInput = event.target.closest('.form-row').querySelector('.quantity-group input[type="hidden"]');  // Find the quantity error message span
-	console.log(hiddenStockInput);
     let stock = null; // Default value in case qtyErrorMessage is null
 
 	// Check if qtyErrorMessage is not null and then proceed
@@ -212,7 +211,6 @@ function validateQuantity(value) {
         errorMessage = `Qtd inválida.`;
         isValid = false;
     }
-	console.log(isValid);
     return { isValid, errorMessage };
 }
 // -----------------------------------------------------DESTINO VALIDATION  -------------------------------------------------------------
@@ -353,6 +351,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	const direcaoSelect = document.getElementById('direcao'); // Get the 'direcao' select element
 	const secretariaSelect = document.getElementById('secretaria'); // Get the 'secretaria' select element
 	
+	// Get all step elements
+	const steps = document.querySelectorAll('.step');
+
+	// Get all sections
+	const sections = document.querySelectorAll('.section');
+
 	
 	
 // -----------------------------------------------------~PHASE 1 OF FORM   -------------------------------------------------------------
@@ -682,6 +686,36 @@ document.addEventListener('DOMContentLoaded', function() {
 			return; // Stop if validation fails
 		}
 
+		// Copy personal data
+		document.getElementById('review-first-name').innerText = document.getElementById('first-name').value;
+		document.getElementById('review-last-name').innerText = document.getElementById('last-name').value;
+		document.getElementById('review-email').innerText = document.getElementById('email').value;
+		document.getElementById('review-voip').innerText = document.getElementById('voip').value;
+		document.getElementById('review-direcao').innerText = document.getElementById('direcao').options[document.getElementById('direcao').selectedIndex].text;
+		document.getElementById('review-secretaria').innerText = document.getElementById('secretaria').options[document.getElementById('secretaria').selectedIndex].text;
+		document.getElementById('review-request-date').innerText = document.getElementById('request-date').value;
+
+		// Copy equipment data
+		const itemsContainer = document.getElementById('items-container');
+		const reviewItemsTbody = document.getElementById('review-items-tbody');
+		reviewItemsTbody.innerHTML = ''; // Clear previous items
+
+		itemsContainer.querySelectorAll('.form-row').forEach(function(row) {
+			const itemCode = row.querySelector('.item-code').value;
+			const itemName = row.querySelector('.item-name').value;
+			const quantity = row.querySelector('.quantity').value;
+
+			const tr = document.createElement('tr');
+			tr.innerHTML = `<td>${itemCode}</td><td>${itemName}</td><td>${quantity}</td>`;
+			reviewItemsTbody.appendChild(tr);
+		});
+
+		// Copy destination and justification
+		document.getElementById('review-destino').innerText = document.getElementById('destino').options[document.getElementById('destino').selectedIndex].text;
+		document.getElementById('review-justification').innerText = document.getElementById('justification').value;
+
+
+
 		// Hide the "Equipamentos" section and show the "Revisao" section with smooth transitions
 		const equipamentos = document.getElementById("equipamentos");
 		const revisao = document.getElementById("revisao");
@@ -705,6 +739,38 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 		if (steps.length > 2) {
 			steps[2].classList.add("active"); // Add 'active' class to the third step
+		}
+	});
+	
+// -----------------------------------------------------~PHASE 3 OF FORM   -------------------------------------------------------------
+	
+	// Previous button: transition between sections and update step indicator
+	document.getElementById("anterior-equipamentos").addEventListener('click', function(e) {
+		e.preventDefault(); // Prevent default action (e.g., form submission)
+
+		// Hide "Equipamentos" and show "Dados Gerais" with a smooth transition
+		const revisao = document.getElementById("revisao");
+		const equipamentos = document.getElementById("equipamentos");
+		
+		revisao.style.transition = 'opacity 0.5s ease-out'; // Transition out
+		equipamentos.style.transition = 'opacity 0.5s ease-in'; // Transition in
+
+		revisao.style.opacity = 0; // Fade out "Equipamentos"
+		equipamentos.style.opacity = 1; // Fade in "Dados Gerais"
+
+		setTimeout(function() {
+			// Set display style after fade-out
+			revisao.style.display = 'none';
+			equipamentos.style.display = 'block';
+		}, 500);
+
+		// Update the step indicator by removing 'active' from all steps and adding it to the first step
+		const steps = document.querySelectorAll(".step");
+		steps.forEach(function(step) {
+			step.classList.remove("active");
+		});
+		if (steps.length > 0) {
+			steps[1].classList.add("active"); // Add the 'active' class to the first step
 		}
 	});
 });

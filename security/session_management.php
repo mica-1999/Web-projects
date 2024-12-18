@@ -9,7 +9,6 @@ if (isset($_SESSION['last_activity'])) {
         // If session has expired, destroy the session and redirect to login page
         session_unset();  // Remove all session variables
         session_destroy(); // Destroy the session
-        header("Location: ../auth/login.php"); // Redirect to login page
         exit();
     }
 }

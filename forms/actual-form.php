@@ -152,7 +152,7 @@ $direcao_options = fetchDirecao($conn);
 
 					<div id="items-container">
 						<div class="form-row" id="item-row">
-							<div class="form-group item-code">
+							<div class="form-group item-codigo">
 								<input type="number" class="item-code" id="item-code" placeholder="#Num" required />
 								<label for="item-code">#</label>
 								<span class="error-message" id="item-code-error"></span>
@@ -204,11 +204,42 @@ $direcao_options = fetchDirecao($conn);
 					</div>
 				</div> 
 				
-				<div id="revisao" style="display: none">this is just testing</div>
+				<div id="revisao" style="display: none">
+					<h4 class="subtitle">Revisão</h4>
+					<div class="review-section">
+						<h5>Dados Pessoais</h5>
+						<p><strong>Primeiro Nome:</strong> <span id="review-first-name"></span></p>
+						<p><strong>Último Nome:</strong> <span id="review-last-name"></span></p>
+						<p><strong>E-mail:</strong> <span id="review-email"></span></p>
+						<p><strong>VoIP:</strong> <span id="review-voip"></span></p>
+						<p><strong>Direção:</strong> <span id="review-direcao"></span></p>
+						<p><strong>Secretária:</strong> <span id="review-secretaria"></span></p>
+						<p><strong>Data do Pedido:</strong> <span id="review-request-date"></span></p>
+					</div>
+					
+					<div class="review-section">
+						<h5>Equipamento a Pedir</h5>
+						<table id="review-items-table">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Nome do Item</th>
+									<th>Quantidade</th>
+								</tr>
+							</thead>
+							<tbody id="review-items-tbody">
+								<!-- Item rows will be inserted here -->
+							</tbody>
+						</table>
+						<p><strong>Local de Destino:</strong> <span id="review-destino"></span></p>
+						<p><strong>Justificação:</strong> <span id="review-justification"></span></p>
+					</div>
+					<div class="form-row" id="button-row">
+						<button type="button" class="submit-btn anterior" id="anterior-equipamentos" style="background-color: #6c757d;">Anterior</button>
+						<button type="button" class="submit-btn proximo" id="post" style="background-color: #00AA6D;">Submeter</button>
+					</div>
+				</div>
 			</div>
-			
-			
-			<button type="submit" class="submit-btn" style="background-color: #06C597; display:none">Enviar Pedido</button>
 		</form>
 	</div>
 </div>
@@ -244,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		if (inactiveTime > timeoutDuration) {
 			// If session has expired, redirect to login page
-			window.location.href = "../auth/login.php";  // Redirect to login page
+			// window.location.href = "../auth/login.php";  // Redirect to login page
 		}
 	}
 

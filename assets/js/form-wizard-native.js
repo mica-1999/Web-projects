@@ -42,6 +42,7 @@ function validatePhaseOne(field) {
 // -----------------------------------------------------PHASE 2 VALIDATION -------------------------------------------------------------
 function validatePhaseTwo(field) {
     var value = field.value.trim(); // Get the trimmed value of the input field
+
     var isValid = true;
     var errorMessage = '';
 
@@ -196,11 +197,22 @@ function validateQuantity(value) {
     let errorMessage = '';
     let isValid = true;
 
-    // Ensure the quantity is a number between 1 and 50
-    if (isNaN(quantityValue) || quantityValue < 1 || quantityValue > 50) {
-        errorMessage = "Qtd inválida";
+    // Find the stock value in the span next to the quantity input
+    let hiddenStockInput = event.target.closest('.form-row').querySelector('.quantity-group input[type="hidden"]');  // Find the quantity error message span
+	console.log(hiddenStockInput);
+    let stock = null; // Default value in case qtyErrorMessage is null
+
+	// Check if qtyErrorMessage is not null and then proceed
+	if (hiddenStockInput) {
+		stock = parseInt(hiddenStockInput.value, 10);
+	}
+
+    // Ensure the quantity is a number and does not exceed the available stock
+    if (quantityValue < 1 || (stock !== null && quantityValue > stock)) {	
+        errorMessage = `Qtd inválida.`;
         isValid = false;
     }
+	console.log(isValid);
     return { isValid, errorMessage };
 }
 // -----------------------------------------------------DESTINO VALIDATION  -------------------------------------------------------------
@@ -452,24 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 // -----------------------------------------------------~PHASE 2 OF FORM   -------------------------------------------------------------
-	// Event to reset color and show error on blur for Phase 2 fields
-	const requiredFields = document.querySelectorAll("#equipamentos input[required], #equipamentos select[required], #equipamentos textarea[required]");
-
-	requiredFields.forEach(function(field) {
-		field.addEventListener('blur', function() {
-			this.style.color = '#3A3F48';  // Reset color on blur
-			const result = validatePhaseTwo(this); // Validate Phase 2
-			
-			const errorElement = document.getElementById(this.id + '-error');
-			if (errorElement) {
-				errorElement.textContent = result.errorMessage; // Display error
-				errorElement.style.display = 'block'; // Show error message
-			}
-		});
-	});
-	
-	
-	
 	let timeout;
 	// Event listener for item-code inputs in dynamically added rows
 	document.querySelector("#items-container").addEventListener('input', function(event) {
@@ -499,6 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							let itemNameInput = event.target.closest('.form-row').querySelector('.item-name');
 							let qtyInput = event.target.closest('.form-row').querySelector('.quantity');
 							let qtyErrorMessage = event.target.closest('.form-row').querySelector('.quantity-group .error-message');  // Find the quantity error message span
+							let hiddenStockInput = event.target.closest('.form-row').querySelector('.quantity-group input[type="hidden"]');  // Find the quantity error message span
 
 							if (itemNameInput) {
 								itemNameInput.value = data.item_name;
@@ -510,8 +505,12 @@ document.addEventListener('DOMContentLoaded', function() {
 								// Update the error message with available stock
 								let stock = data.stock;  // Retrieve the stock from the data
 								qtyErrorMessage.textContent = `Available: ${stock}`;  // Display stock in the error message
-								qtyErrorMessage.style.color = 'green'; // Style the message (green for availability)
+								qtyErrorMessage.style.color = 'red'; // Style the message (green for availability)
 								qtyErrorMessage.style.display = 'block'; // Ensure it's visible
+								
+								if (hiddenStockInput) {
+									hiddenStockInput.value = stock;
+								}
 							}
 						} else {
 							let itemNameInput = event.target.closest('.form-row').querySelector('.item-name');

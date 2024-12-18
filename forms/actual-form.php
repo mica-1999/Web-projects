@@ -166,6 +166,7 @@ $direcao_options = fetchDirecao($conn);
 								<input type="text" class="quantity" id="quantity" placeholder="Digite a Quantidade" required />
 								<label for="quantity">Qty</label>
 								<span class="error-message" id="quantity-error"></span>
+								<input type="hidden" id="hiddenStock" name="hiddenStock" value="" />
 							</div>
 
 							<!-- Clean field button to clear the row fields -->
